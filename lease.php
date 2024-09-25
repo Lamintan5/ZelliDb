@@ -149,9 +149,9 @@
     }
 
     if('UPDATE' == $action){
-        $tid = $_POST['tid'];
+        $lid = $_POST['lid'];
         $end = $_POST['end'];
-        $sql = "UPDATE $table SET  end = '$end' WHERE tid = '$tid'";
+        $sql = "UPDATE $table SET  end = '$end' WHERE lid = '$lid'";
         if ($conn->query($sql) === TRUE) { 
             echo "success";
         } else {
