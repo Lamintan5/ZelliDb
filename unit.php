@@ -212,43 +212,56 @@
     }
 
 
-    if('UPDATE_TID' == $action){
+    if (isset($action) && $action === 'UPDATE_TID') {
         $id = $_POST['id'];
         $tid = $_POST['tid'];
         $lid = $_POST['lid'];
-
-        $sql = "SELECT `tid` FROM $table WHERE id = '$id'";
-        $result = $conn->query($sql);
-
-        if ($result && $result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $tidField = $row['tid'];
     
-            if (empty($tidField)) {
-                $newTidField = $tid;
+        $id = $conn->real_escape_string($id);
+        $tid = $conn->real_escape_string($tid);
+        $lid = $conn->real_escape_string($lid);
+    
+        if ($tid === "" && $lid === "") {
+            $updateSql = "UPDATE $table SET `tid` = '', `lid` = '' WHERE id = '$id'";
+            if ($conn->query($updateSql) === TRUE) {
+                echo "success";
             } else {
-                $tidsArray = explode(',', $tidField);
-                if (!in_array($tid, $tidsArray)) {
-                    $newTidField = $tidField . ',' . $tid;
-                } else {
-                    $newTidField = $tidField;
-                }
+                echo "error";
             }
-            $updateSql = "UPDATE $table SET `tid` = '$newTidField', lid = '$lid' WHERE id = '$id'";
-                if ($conn->query($updateSql) !== TRUE) {
-                    echo "error";
-                    $conn->close();
-                    return;
-                } else {
-                    echo "success";
-                }
         } else {
-            echo "Does not exist";
+            $sql = "SELECT `tid` FROM $table WHERE id = '$id'";
+            $result = $conn->query($sql);
+    
+            if ($result && $result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $tidField = $row['tid'];
+    
+                if (empty($tidField)) {
+                    $newTidField = $tid;
+                } else {
+                    $tidsArray = explode(',', $tidField);
+                    if (!in_array($tid, $tidsArray)) {
+                        $newTidField = $tidField . ',' . $tid;
+                    } else {
+                        $newTidField = $tidField;
+                    }
+                }
+    
+                $updateSql = "UPDATE $table SET `tid` = '$newTidField', `lid` = '$lid' WHERE id = '$id'";
+                if ($conn->query($updateSql) === TRUE) {
+                    echo "success";
+                } else {
+                    echo "error";
+                }
+            } else {
+                echo "Does not exist";
+            }
         }
-
+    
+        // Close the connection
         $conn->close();
-        return;
     }
+    
 
     if('UPDATE' == $action){
         $id = $_POST['id'];
