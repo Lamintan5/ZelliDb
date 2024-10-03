@@ -114,7 +114,7 @@
         $eid = $_POST['eid'];
         $uid = $_POST['uid'];
     
-        $tables = ['entity', 'payments', 'lease', 'units', 'stars', 'reviews', 'duties']; 
+        $tables = ['entity', 'payments', 'lease', 'units', 's-+tars', 'reviews', 'duties']; 
         $sql = "SELECT `pid` FROM entity WHERE eid = '$eid'";
         $result = $conn->query($sql);
     

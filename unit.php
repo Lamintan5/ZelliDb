@@ -17,8 +17,7 @@
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
         }
-        $pid = $_POST['pid'];
-        $query = "SELECT * FROM $table WHERE FIND_IN_SET('" . $pid . "', pid)";
+        $query = "SELECT * FROM $table";
         $result = $db->query($query);
         $data = [];
         while ($row = $result->fetch_assoc()) {
