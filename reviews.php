@@ -36,7 +36,7 @@
     
         // Use prepared statement to prevent SQL injection
         $sql = "INSERT INTO $table (rid, eid, pid, sid, uid, message, image, star) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                VALUES ('$rid', '$eid', '$pid', '$sid', '$uid', '$message', '$image', '$star')";
         
         $query = mysqli_query($db,$sql);
         if($query){
@@ -45,7 +45,6 @@
             echo 'Failed';
         }
     
-        mysqli_stmt_close($stmt);
         return;
     }
     
