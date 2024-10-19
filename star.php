@@ -23,8 +23,8 @@
         $uid = $_POST['uid'];
         $rate = $_POST['rate'];
         $type = $_POST['type'];
-        $sql = "INSERT INTO $table (sid, pid, rid, eid, uid, rate, type) 
-        VALUES ('$sid','$pid','$rid','$eid','$uid', '$rate', '$type')";
+        
+        $sql = "INSERT INTO $table (sid, pid, rid, eid, uid, rate, type, checked) VALUES ('$sid','$pid','$rid','$eid','$uid', '$rate', '$type', 'true')";
         $query = mysqli_query($db,$sql);
         if($query){
             echo 'Success';
