@@ -14,6 +14,7 @@
     }
 
     if('ADD' == $action){
+        $image = $_FILES['image']['name'];
         $nid = $_POST['nid'];
         $sid = $_POST['sid'];
         $rid = $_POST['rid'];
@@ -32,6 +33,14 @@
         if($count == 1){
             echo 'Exists';
         } else {
+            if (isset($_FILES['image']) && !empty($_FILES['image']['name'])) {
+                $image = $_FILES['image']['name'];
+                $tmp_name = $_FILES['image']['tmp_name'];
+                $imagePath = 'uploads/' . $image;
+                move_uploaded_file($tmp_name, $imagePath);
+            } else {
+                $image = $_POST['image']; 
+            }
             $insert = "INSERT INTO $table(nid,sid,rid,eid,pid,text,seen,message,actions,type,deleted,checked) 
             VALUES ('".$nid."','".$sid."','".$rid."','".$eid."','".$pid."','".$text."','','".$message."','".$actions."','".$type."','','true')";
             $query = mysqli_query($db,$insert);
