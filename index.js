@@ -142,6 +142,7 @@ io.on("connection", (socket) => {
         let title = msg.title;
         let recipientToken = msg.token;
         let profile = msg.profile;
+        let image = msg.path;
 
         targetIds.forEach(pid => {
             if (clients[pid]) {
@@ -162,6 +163,7 @@ io.on("connection", (socket) => {
             small_icon: "ic_app_log",
             groupSummaryIcon: "ic_app_log",
             large_icon: profile,
+            big_picture: image,
            
             data: {
                 PushTitle: "STUDIO5IVE",
