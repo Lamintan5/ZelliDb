@@ -166,6 +166,22 @@
         return;
     }
 
+    if('UPDATE_DETAILS' == $action){
+        $lid = $_POST['lid'];
+        $rent = $_POST['rent'];
+        $deposit = $_POST['deposit'];
+        $start = $_POST['start'];
+        $end = $_POST['end'];
+        $sql = "UPDATE $table SET rent = '$rent', deposit = '$deposit', start = '$start',  end = '$end' WHERE lid = '$lid'";
+        if ($conn->query($sql) === TRUE) { 
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    }
+
     if('UPDATE_ALL_TENANTS' == $action){
         $eid = $_POST['eid'];
         $end = $_POST['end'];
