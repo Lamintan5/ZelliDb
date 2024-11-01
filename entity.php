@@ -24,6 +24,7 @@
         $due = $_POST['due'];
         $late = $_POST['late'];
         $utilities = $_POST['utilities'];
+        $location = $_POST['location'];
         
         $sql = "SELECT eid FROM $table WHERE eid = '".$eid."'";
         $result = mysqli_query($db,$sql);
@@ -39,8 +40,8 @@
             } else {
                 $image = $_POST['image']; 
             }
-            $insert = "INSERT INTO $table(eid,pid,admin,title,category,image,due,late,utilities,checked) 
-            VALUES ('".$eid."','".$pid."','".$admin."','".$title."','".$category."','".$image."','".$due."','".$late."', '".$utilities."', 'true')";
+            $insert = "INSERT INTO $table(eid,pid,admin,title,category,image,due,late,utilities,location,checked) 
+            VALUES ('".$eid."','".$pid."','".$admin."','".$title."','".$category."','".$image."','".$due."','".$late."', '".$utilities."', '".$location."','true')";
             $query = mysqli_query($db,$insert);
             if($query){
                 echo 'Success';
@@ -294,16 +295,20 @@
         $image = $_FILES['image']['name'];
         $eid = $_POST['eid'];
         $title = $_POST['title'];
+        $location = $_POST['location'];
         $category = $_POST['category'];
         $due = $_POST['due'];
         $late = $_POST['late'];        
     
-        if (!empty($image)) {
-            $imagePath = 'logos/' . $image;
+        if (isset($_FILES['image']) && !empty($_FILES['image']['name'])) {
+            $image = $_FILES['image']['name'];
             $tmp_name = $_FILES['image']['tmp_name'];
+            $imagePath = 'logos/' . $image;
             move_uploaded_file($tmp_name, $imagePath);
+        } else {
+            $image = $_POST['image']; 
         }
-        $sql = "UPDATE $table SET title = '$title', category = '$category', due = '$due', late = '$late', image = '$image'";
+        $sql = "UPDATE $table SET title = '$title', location = '$location', category = '$category', due = '$due', late = '$late', image = '$image'";
        
 
         $sql .= " WHERE eid = '$eid'";
