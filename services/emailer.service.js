@@ -2,16 +2,15 @@ var nodemailer = require('nodemailer');
 
 async function sendEmail(params, callback){
     var transport = nodemailer.createTransport({
-        host: 'mail.privateemail.com',
-        port: 465, 
+        service: 'gmail',
         auth: {
-            user: 'info@studio5ive.org',
-            pass: 'Eatmyass@2000',
+            user: 'billclinton1758@gmail.com',
+            pass: 'tgev djgo aegx vtnr',
         }
     });
 
     var mailOptions = {
-        from: `"Studio5ive" <info@studio5ive.org>`,
+        from: 'billclinton1758@gmail.com',
         to: params.email,
         subject: params.subject,
         text: params.body,
