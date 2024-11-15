@@ -32,8 +32,8 @@
         if($count>=1){
             echo 'Exists';
         } else {
-            $sql = "INSERT INTO $table (lid, tid, ctid, eid, uid, pid, rent, deposit, start, end) 
-            VALUES('$lid','$tid','$tid','$eid','$uid','$pid', '$rent', '$deposit', '$start','$end')";
+            $sql = "INSERT INTO $table (lid, tid, ctid, eid, uid, pid, rent, deposit, deduct, refund, balance, start, end) 
+            VALUES('$lid','$tid','$tid','$eid','$uid','$pid', '$rent', '$deposit', '', '', '','$start','$end')";
             $result = $conn->query($sql);
             echo 'success';
         }
