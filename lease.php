@@ -14,6 +14,20 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+
+    if('UPDATE' == $action){
+        $lid = $_POST['lid'];
+        $end = $_POST['end'];
+        $sql = "UPDATE $table SET  end = '$end' WHERE lid = '$lid'";
+        if ($conn->query($sql) === TRUE) { 
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    }
+
     if('UPDATE_DETAILS' == $action){
         $lid = $_POST['lid'];
         $rent = $_POST['rent'];
