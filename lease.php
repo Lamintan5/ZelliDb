@@ -14,6 +14,20 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+
+    if('UPDATE_ALL_TENANTS' == $action){
+        $eid = $_POST['eid'];
+        $end = $_POST['end'];
+        $sql = "UPDATE $table SET end = '$end' WHERE eid = '$eid'";
+        if ($conn->query($sql) === TRUE) { 
+            echo "success";
+        } else {
+            echo "error2";
+        }
+        $conn->close();
+        return;
+    }
+
     if (isset($action) && $action === 'UPDATE_COTID') {
         $lid = $_POST['lid'];
         $tid = $_POST['tid'];
