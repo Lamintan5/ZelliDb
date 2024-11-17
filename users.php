@@ -25,6 +25,26 @@
 
 
 
+    if('UPDATE' == $action){
+        $uid = $_POST['uid'];
+        $username = $_POST['username'];
+        $first = $_POST['first'];
+        $last = $_POST['last'];
+        $email = $_POST['email'];
+        $phone = $_POST['phone'];   
+        $password = md5($_POST['password']); 
+        $status = $_POST['status'];
+
+        $sql = "UPDATE $table SET username = '$username', first = '$first', last = '$last', email = '$email', phone = '$phone', password = '$password', status = '$status' WHERE uid = '$uid'";
+        if ($conn->query($sql) === TRUE) { 
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    }
+
     if('UPDATE_PASS' == $action){
         $uid = $_POST['uid'];
         $password = md5($_POST['password']); 
