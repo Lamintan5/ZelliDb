@@ -26,6 +26,21 @@
 
 
 
+    if('UPDATE_TOKEN' == $action){
+        $uid = $_POST['uid'];
+        $token = $_POST['token']; 
+       
+        $sql = "UPDATE $table SET  token = '$token' WHERE uid = '$uid'";
+        if ($conn->query($sql) === TRUE) { 
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    }
+
+
     if('UPDATE_EMAIL' == $action){
         $uid = $_POST['uid'];
         $email = $_POST['email']; 
