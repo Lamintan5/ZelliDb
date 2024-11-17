@@ -16,7 +16,19 @@
     
 
     
-    
+    if('GET' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $email = $_POST['email'];
+        $query = "SELECT * FROM $table WHERE email = '".$email."'";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
 
     if('GET_CURRENT' == $action){
         if ($db->connect_errno) {
