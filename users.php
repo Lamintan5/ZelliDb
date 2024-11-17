@@ -20,6 +20,20 @@
 
    
 
+    if('GET_BY_STATUES' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $status = $_POST['status'];
+        $query = "SELECT * FROM $table WHERE status = '".$status."'";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
+
     if('GET_ONE' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
