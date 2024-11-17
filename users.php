@@ -25,5 +25,17 @@
 
 
 
+
+    if('DELETE' == $action){
+        $uid = $_POST['uid'];
+        $sql = "DELETE FROM $table WHERE uid = '$uid'";
+        if ($conn->query($sql) === TRUE) {
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    }
     
 ?>
