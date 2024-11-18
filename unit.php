@@ -12,6 +12,23 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+
+
+    if('GET_BY_TENANT_ONLY' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $tid = $_POST['tid'];
+        $query = "SELECT * FROM $table WHERE  tid = '".$tid."'";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
+
+
     if('GET_BY_ENTITY' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
