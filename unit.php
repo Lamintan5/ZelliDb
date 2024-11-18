@@ -12,6 +12,18 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if('UPDATE_PID' == $action){
+        $eid = $_POST['eid'];
+        $pid = $_POST['pid'];
+        $sql = "UPDATE $table SET  pid = '$pid' WHERE eid = '$eid'";
+        if ($conn->query($sql) === TRUE) { 
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    }
 
     if('REMOVE_TID' == $action){
         $id = $_POST['id'];
