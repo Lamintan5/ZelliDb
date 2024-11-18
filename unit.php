@@ -12,6 +12,24 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+
+    if('GET_PROP_UNIT_FLOOR' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+    
+        $eid = $_POST['eid'];
+        $floor = $_POST['floor'];
+        $query = "SELECT * FROM $table WHERE eid = '".$eid."' AND floor = '".$floor."'";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
+
+
     if('UPDATE_PID' == $action){
         $eid = $_POST['eid'];
         $pid = $_POST['pid'];
