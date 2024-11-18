@@ -13,6 +13,18 @@
     }
 
 
+    if('GET_ALL' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $query = "SELECT * FROM $table";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
 
     if('GET_CURRENT' == $action){
         if ($db->connect_errno) {
