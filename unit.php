@@ -13,6 +13,43 @@
     }
 
 
+    if('REMOVE_TID' == $action){
+        $id = $_POST['id'];
+        $tid = $_POST['tid'];
+
+        $sql = "SELECT `tid` FROM $table WHERE id = '$id'";
+        $result = $conn->query($sql);
+
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $tidField = $row['tid'];
+    
+            if (!empty($tidField)) {
+                $tidsArray = explode(',', $tidField);
+                $tidsArray = array_filter($tidsArray, function($item) use ($tid) {
+                    return $item != $tid;
+                });
+                $newTidField = implode(',', $tidsArray);
+            } else {
+                $newTidField = '';
+            }
+    
+            $updateSql = "UPDATE $table SET `tid` = '$newTidField' WHERE id = '$id'";
+                if ($conn->query($updateSql) !== TRUE) {
+                    echo "error";
+                    $conn->close();
+                    return;
+                } else {
+                    echo "success";
+                }
+        } else {
+            echo "Does not exist";
+        }
+
+        $conn->close();
+        return;
+    }
+
 
     if (isset($action) && $action === 'UPDATE_TID') {
         $id = $_POST['id'];
