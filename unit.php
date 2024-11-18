@@ -12,7 +12,38 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if('ADD' == $action){
+        $id = $_POST['id'];
+        $pid = $_POST['pid'];
+        $eid = $_POST['eid'];
+        $tid = $_POST['tid'];
+        $lid = $_POST['lid'];
+        $title = $_POST['title'];
+        $room = $_POST['room'];
+        $floor = $_POST['floor'];
+        $price = $_POST['price'];
+        $deposit = $_POST['deposit'];
+        $status = $_POST['status'];
 
+        $sql = "SELECT id FROM $table WHERE id = '".$id."'";
+        $result = mysqli_query($db,$sql);
+        $count = mysqli_num_rows($result);
+
+        if($count > 0){
+            echo 'Exists';
+        } else {
+            $sql = "INSERT INTO $table (id, pid, eid, tid, lid, title, room, floor,  price, deposit, status, checked) 
+            VALUES('$id','$pid','$eid','$tid', '$lid', '$title','$room','$floor','$price','$deposit','$status', 'true')";
+            $query = mysqli_query($db,$sql);
+            if($query){
+                echo 'Success';
+            } else {
+                echo 'Failed';
+            }
+            return;
+        }
+    }
+    
     if('GET_ALL' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
