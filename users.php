@@ -153,8 +153,6 @@
         echo json_encode($data);
     }
 
-    
-
     if('UPDATE_PROFILE' == $action){
         $image = $_FILES['image']['name'];
         $uid = $_POST['uid'];
