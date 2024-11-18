@@ -14,4 +14,16 @@
 
 
 
+
+    if('DELETE_ALL' == $action){
+        $eid = $_POST['eid'];
+        $sql = "DELETE FROM $table WHERE eid = '$eid'";
+        if ($conn->query($sql) === TRUE) {
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    } 
 ?>
