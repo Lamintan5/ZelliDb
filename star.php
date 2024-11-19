@@ -16,6 +16,35 @@
 
     
 
+    if('ADD_MNTNCE' == $action){
+        $sid = $_POST['sid'];
+        $pid = $_POST['pid'];
+        $rid = $_POST['rid'];
+        $eid = $_POST['eid'];
+        $uid = $_POST['uid'];
+        $rate = $_POST['rate'];
+        $type = $_POST['type'];
+
+        $sql = "SELECT  sid FROM $table WHERE sid = '".$sid."' AND uid = '".$uid."'  AND type = 'MNTNCE' ";
+        $result = mysqli_query($db,$sql);
+        $count = mysqli_num_rows($result);
+
+        if($count == 1){
+            echo 'Exists';
+        } else {
+            $sql = "INSERT INTO $table (sid, pid, rid, eid, uid, rate, type) 
+            VALUES ('$sid','$pid','$rid','$eid','$uid', '$rate', '$type')";
+    
+            $query = mysqli_query($db,$sql);
+            if($query){
+                echo 'Success';
+            } else {
+                echo 'Failed';
+            }
+            return;
+        }        
+    }
+
     if('GET_CURRENT' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
