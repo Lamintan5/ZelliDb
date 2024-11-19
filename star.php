@@ -16,6 +16,21 @@
 
     
 
+    if('UPDATE' == $action){
+        $payid = $_POST['payid'];
+        $amount = $_POST['amount'];
+        $type = $_POST['type'];
+        $time = $_POST['time'];
+        $sql = "UPDATE $table SET  amount = '$amount', type = '$type', time = '$time' WHERE payid = '$payid'";
+        if ($conn->query($sql) === TRUE) { 
+            echo "success";
+        } else {
+            echo "error2";
+        }
+        $conn->close();
+        return;
+    }
+
     if('DELETE' == $action){
         $id = $_POST['payid'];
         $sql = "DELETE FROM $table WHERE payid = '$payid'";
