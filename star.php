@@ -15,6 +15,24 @@
     }
 
     
+    if('ADD' == $action){
+        $sid = $_POST['sid'];
+        $pid = $_POST['pid'];
+        $rid = $_POST['rid'];
+        $eid = $_POST['eid'];
+        $uid = $_POST['uid'];
+        $rate = $_POST['rate'];
+        $type = $_POST['type'];
+        
+        $sql = "INSERT INTO $table (sid, pid, rid, eid, uid, rate, type, checked) VALUES ('$sid','$pid','$rid','$eid','$uid', '$rate', '$type', 'true')";
+        $query = mysqli_query($db,$sql);
+        if($query){
+            echo 'Success';
+        } else {
+            echo 'Failed';
+        }
+        return;
+    }
 
     if('ADD_ENTITY' == $action){
         $sid = $_POST['sid'];
