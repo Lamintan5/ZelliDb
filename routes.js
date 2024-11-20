@@ -1,4 +1,16 @@
+const otpController = require("./contollers/otp.controller");
+const pushNotificationController = require("./contollers/push-notification.controller");
 
+const express = require("express");
+const router = express.Router();
+const multer = require("multer");
+
+
+router.post("/otp-login", otpController.otpLogin);
+router.post("/otp-verify", otpController.verifyOTP);
+
+router.get("/SendNotification", pushNotificationController.SendNotification);
+router.post("/SendNotificationToDevice", pushNotificationController.SendNotificationToDevice);
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
