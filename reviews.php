@@ -14,6 +14,39 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if ('ADD' == $action) {
+        // Sanitize and validate input values
+        $rid = mysqli_real_escape_string($db, $_POST['rid']);
+        $eid = mysqli_real_escape_string($db, $_POST['eid']);
+        $pid = mysqli_real_escape_string($db, $_POST['pid']);
+        $sid = mysqli_real_escape_string($db, $_POST['sid']);
+        $uid = mysqli_real_escape_string($db, $_POST['uid']);
+        $message = mysqli_real_escape_string($db, $_POST['message']);
+        $star = mysqli_real_escape_string($db, $_POST['star']);
+    
+        // Handle image upload if it exists
+        $imagePath = '';
+        if (!empty($_FILES['image']['name'])) {
+            $image = $_FILES['image']['name'];
+            $imagePath = 'uploads/' . $image;
+            move_uploaded_file($_FILES['image']['tmp_name'], $imagePath);
+        } else {
+            $image = '';
+        }
+    
+        // Use prepared statement to prevent SQL injection
+        $sql = "INSERT INTO $table (rid, eid, pid, sid, uid, message, image, star) 
+                VALUES ('$rid', '$eid', '$pid', '$sid', '$uid', '$message', '$image', '$star')";
+        
+        $query = mysqli_query($db,$sql);
+        if($query){
+            echo 'Success';
+        } else {
+            echo 'Failed';
+        }
+    
+        return;
+    }
     
     
 
