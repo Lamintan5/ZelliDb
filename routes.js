@@ -1,4 +1,7 @@
 
+const upload = multer({
+    storage: storage,
+});
 
 router.route("/addimage").post(upload.single("img"), (req, res) => {
     try {
