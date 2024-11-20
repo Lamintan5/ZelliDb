@@ -14,6 +14,21 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    
+
+    if('UPDATE_UNIT' == $action){
+        $mid = $_POST['mid'];
+        $duties = $_POST['duties'];
+    
+        $sql = "UPDATE $table SET duties = '$duties' WHERE mid = '$mid'";
+        if ($conn->query($sql) === TRUE) { 
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    }
 
 
     if('DELETE' == $action){
