@@ -15,6 +15,31 @@
     }
 
     
+    if('ADD' == $action){
+        $payid = $_POST['payid'];
+        $pid = $_POST['pid'];
+        $admin = $_POST['admin'];
+        $tid = $_POST['tid'];
+        $lid = $_POST['lid'];
+        $eid = $_POST['eid'];
+        $uid = $_POST['uid'];
+        $payerid = $_POST['payerid'];
+        $amount = $_POST['amount'];
+        $balance = $_POST['balance'];
+        $method = $_POST['method'];
+        $type = $_POST['type'];
+        $time = $_POST['time'];
+        $sql = "INSERT INTO $table (payid, pid,admin, tid,lid, eid, uid, payerid, amount, balance, method, type, time, checked) 
+        VALUES ('$payid','$pid','$admin','$tid','$lid','$eid','$uid', '$payerid', '$amount', '$balance', '$method', '$type', '$time', 'true')";
+        $query = mysqli_query($db,$sql);
+        if($query){
+            echo 'Success';
+        } else {
+            echo 'Failed';
+        }
+        return;
+    }
+
     if('GET_CURRENT' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
