@@ -15,6 +15,19 @@
     }
 
     
+    if('GET_MY' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $uid = $_POST['uid'];
+        $query = "SELECT * FROM $table WHERE FIND_IN_SET('" . $uid . "', pid) OR FIND_IN_SET('" . $uid . "', tid) OR payerid = '".$uid."'";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
 
     if('GET_BY_TENANT' == $action){
         if ($db->connect_errno) {
