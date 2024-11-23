@@ -13,6 +13,20 @@
         die("Connection failed: " . $conn->connect_error);
     }
     
+    if('GET_REQ' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $eid = $_POST['eid'];
+        $query = "SELECT * FROM $table WHERE eid = '".$eid."' AND FIND_IN_SET('MNTNRQ', type)";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
+
     if('GET_MY_REQ' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
