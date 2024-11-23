@@ -13,6 +13,27 @@
         die("Connection failed: " . $conn->connect_error);
     }
     
+    if('ADD_MULTI' == $action){
+        $nid = $_POST['nid'];
+        $sid = $_POST['sid'];
+        $rid = $_POST['rid'];
+        $eid = $_POST['eid'];
+        $pid = $_POST['pid'];
+        $text = $_POST['text'];
+        $seen = $_POST['seen'];
+        $actions = $_POST['actions'];
+        $type = $_POST['type'];
+        $message = $_POST['message'];
+        $insert = "INSERT INTO $table(nid,sid,rid,eid,pid,text,seen,actions,type,message) 
+        VALUES ('".$nid."','".$sid."','".$rid."','".$eid."','".$pid."','".$text."','".$seen."','".$actions."','".$type."','".$message."')";
+        $query = mysqli_query($db,$insert);
+        if($query){
+            echo 'Success';
+        } else {
+            echo 'Failed';
+        }        
+    }
+
 
     if('REQUEST_TENANT' == $action){
         $nid = $_POST['nid'];
