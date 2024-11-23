@@ -13,6 +13,20 @@
         die("Connection failed: " . $conn->connect_error);
     }
     
+    if('GET_CURRENT' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $rid = $_POST['rid'];
+        $query = "SELECT * FROM $table WHERE FIND_IN_SET('" . $rid . "', rid)";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
+
     if('GET_MY' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
