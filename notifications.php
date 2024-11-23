@@ -13,6 +13,20 @@
         die("Connection failed: " . $conn->connect_error);
     }
     
+    if('GET' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $nid = $_POST['nid'];
+        $query = "SELECT * FROM $table WHERE nid = '".$nid."'";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
+    
     if('GET_CURRENT' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
