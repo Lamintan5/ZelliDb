@@ -13,6 +13,18 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if('DELETE' == $action){
+        $nid = $_POST['nid'];
+        $sql = "DELETE FROM $table WHERE nid = '$nid'";
+        if ($conn->query($sql) === TRUE) {
+            echo "success";
+        } else {
+            echo "failed";
+        }
+        $conn->close();
+        return;
+    }
+
     if('DELETE_ALL' == $action){
         $eid = $_POST['eid'];
         $sql = "DELETE FROM $table WHERE eid = '$eid'";
