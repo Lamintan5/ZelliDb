@@ -13,6 +13,7 @@
         die("Connection failed: " . $conn->connect_error);
     }
     
+
     if('REQUEST_TENANT' == $action){
         $nid = $_POST['nid'];
         $sid = $_POST['sid'];
