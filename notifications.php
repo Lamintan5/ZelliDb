@@ -13,6 +13,37 @@
         die("Connection failed: " . $conn->connect_error);
     }
     
+    if('REQUEST_TENANT' == $action){
+        $nid = $_POST['nid'];
+        $sid = $_POST['sid'];
+        $rid = $_POST['rid'];
+        $eid = $_POST['eid'];
+        $pid = $_POST['pid'];
+        $text = $_POST['text'];
+        $seen = $_POST['seen'];
+        $actions = $_POST['actions'];
+        $type = $_POST['type'];
+        $message = $_POST['message'];
+
+        $sql = "SELECT rid, eid, text FROM $table WHERE BINARY rid = '".$rid."' AND eid = '".$eid."' AND text = '".$text."' AND actions = '' ";
+        $result = mysqli_query($db,$sql);
+        $count = mysqli_num_rows($result);
+
+        if($count == 1){
+            echo 'Exists';
+        } else {
+            $insert = "INSERT INTO $table(nid,sid,rid,eid,pid,text,seen,actions,type,message) 
+            VALUES ('".$nid."','".$sid."','".$rid."','".$eid."','".$pid."','".$text."','".$seen."','".$actions."','".$type."','".$message."')";
+            $query = mysqli_query($db,$insert);
+            if($query){
+                echo 'Success';
+            } else {
+                echo 'Failed';
+            }
+        }         
+    }
+
+
     if('TENANT_REQUEST' == $action){
         $nid = $_POST['nid'];
         $sid = $_POST['sid'];
