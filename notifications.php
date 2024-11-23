@@ -12,6 +12,44 @@
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
+    
+    if ('UPDATE_DELETE' == $action) {
+        $nid = $_POST['nid'];
+        $uid = $_POST['uid'];
+    
+        $sql = "SELECT `deleted` FROM $table WHERE nid = '$nid'";
+        $result = $conn->query($sql);
+        
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $deleteField = $row['deleted'];
+    
+            if (empty($deleteField)) {
+                $newDeleteField = $uid;
+            } else {
+                $uidsArray = explode(',', $deleteField);
+                if (!in_array($uid, $uidsArray)) {
+                    $newDeleteField = $deleteField . ',' . $uid;
+                } else {
+                    $newDeleteField = $deleteField;
+                }
+            }
+
+            $updateSql = "UPDATE $table SET `deleted` = '$newDeleteField' WHERE nid = '$nid'";
+            if ($conn->query($updateSql) === TRUE) {
+                echo "success";
+            } else {
+                echo "failed";
+            }
+        } else {
+            echo "Does not exist";
+        }
+    
+        $conn->close();
+        return;
+    }
+    
+    
 
     if ('UPDATE_SEEN' == $action) {
         $nid = $_POST['nid'];
