@@ -12,7 +12,51 @@
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
+    if ('ADD' == $action) {
+        $nid = $_POST['nid'];
+        $sid = $_POST['sid'];
+        $rid = $_POST['rid'];
+        $eid = $_POST['eid'];
+        $pid = $_POST['pid'];
+        $text = $_POST['text'];
+        $message = $_POST['message'];
+        $actions = $_POST['actions'];
+        $type = $_POST['type'];
     
+        // Check for existence of record
+        $sql = "SELECT sid, rid, eid, text, actions, type FROM $table WHERE sid = '".$sid."' AND rid = '".$rid."' AND eid = '".$eid."' 
+                AND text = '".$text."' AND actions = '".$actions."' AND type = '".$type."'";
+        $result = mysqli_query($db, $sql);
+        $count = mysqli_num_rows($result);
+    
+        if ($count == 1) {
+            echo 'Exists';
+        } else {
+            // Handle image upload
+            if (isset($_FILES['image']) && !empty($_FILES['image']['name'])) {
+                $image = $_FILES['image']['name'];
+                $tmp_name = $_FILES['image']['tmp_name'];
+                $imagePath = 'uploads/' . $image;
+                move_uploaded_file($tmp_name, $imagePath);
+            } else {
+                // If no file was uploaded, set $image to an empty string or default value
+                $image = "";
+            }
+    
+            // Insert new record
+            $insert = "INSERT INTO $table (nid, sid, rid, eid, pid, text, seen, message, actions, type, deleted, checked, image) 
+                       VALUES ('".$nid."','".$sid."','".$rid."','".$eid."','".$pid."','".$text."','','".$message."','".$actions."','".$type."','','true', '".$image."')";
+            $query = mysqli_query($db, $insert);
+    
+            if ($query) {
+                echo 'Success';
+            } else {
+                echo 'Failed';
+            }
+        }
+    }
+    
+
     if('ADD_MULTI' == $action){
         $nid = $_POST['nid'];
         $sid = $_POST['sid'];
