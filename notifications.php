@@ -13,6 +13,21 @@
         die("Connection failed: " . $conn->connect_error);
     }
     
+    if('GET_MY' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $uid = $_POST['uid'];
+        $query = "SELECT * FROM $table WHERE FIND_IN_SET('" . $uid . "', rid) OR FIND_IN_SET('" . $uid . "', pid) OR sid = '".$uid."' AND NOT FIND_IN_SET('" . $uid . "', deleted) ";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
+
+
     if('GET_UNSEEN' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
