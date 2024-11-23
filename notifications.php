@@ -13,6 +13,21 @@
         die("Connection failed: " . $conn->connect_error);
     }
     
+    if ('UPDATE' == $action) {
+        $nid = $_POST['nid'];
+        $text = $_POST['text'];
+        $type = $_POST['type'];
+        $actions = $_POST['actions'];
+        $sql = "UPDATE $table SET text = '$text', type = '$type', actions = '$actions', time = NOW() WHERE nid = '$nid'";
+        if ($conn->query($sql) === TRUE) {
+            echo "success";
+        } else {
+            echo "failed";
+        }
+        $conn->close();
+        return;
+    }
+    
     if('UPDATE_ACTION' == $action){
         $nid = $_POST['nid'];
         $actions = $_POST['actions'];
