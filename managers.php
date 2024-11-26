@@ -13,5 +13,16 @@
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
- 
+
+    if('DELETE' == $action){
+        $mid = $_POST['mid'];
+        $sql = "DELETE FROM $table WHERE mid = '$mid'";
+        if ($conn->query($sql) === TRUE) {
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    }    
 ?>
