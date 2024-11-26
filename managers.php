@@ -14,6 +14,31 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if('ADD' == $action){
+        $pid = $_POST['pid'];
+        $eid = $_POST['eid'];
+        $mid = $_POST['mid'];
+        $duties = $_POST['duties'];
+
+        $sql = "SELECT mid, eid FROM $table WHERE BINARY mid = '".$mid."' AND eid = '".$eid."'";
+        $result = mysqli_query($db,$sql);
+        $count = mysqli_num_rows($result);
+
+        if($count == 1){
+            echo 'Exists';
+        } else {
+            $sql = "INSERT INTO $table (pid, eid, mid, duties) VALUES('$pid','$eid','$mid','$duties')";
+    
+            $query = mysqli_query($db,$sql);
+            if($query){
+                echo 'Success';
+            } else {
+                echo 'Failed';
+            }
+            return;
+        }
+    }
+
     if('GET_ALL' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
