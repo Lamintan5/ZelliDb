@@ -13,6 +13,32 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if('ADD' == $action){
+        $image = $_FILES['image']['name'];
+        $mid = $_POST['mid'];
+        $uid = $_POST['uid'];
+        $text = $_POST['text'];
+        $type = $_POST['type'];
+        $deleted = $_POST['deleted'];
+        $seen = $_POST['seen'];
+        $delivered = $_POST['delivered'];
+        $checked = $_POST['checked'];
+        $time = $_POST['time'];
+
+        if (!empty($image)) {
+            $imagePath = 'media/' . $image;
+            $tmp_name = $_FILES['image']['tmp_name'];
+            move_uploaded_file($tmp_name, $imagePath);
+        }
+        $insert = "INSERT INTO $table(mid,uid,text,image,type,deleted,seen,delivered,checked,time) 
+        VALUES ('".$mid."','".$uid."','".$text."','".$image."','".$type."','".$deleted."','".$seen."','".$delivered."','".$checked."','".$time."')";
+        $query = mysqli_query($db,$insert);
+        if($query){
+            echo 'Success';
+        } else {
+            echo 'Failed';
+        }        
+    }
 
     if('GET_CURRENT' == $action){
         if ($db->connect_errno) {
