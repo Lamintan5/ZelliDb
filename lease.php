@@ -15,6 +15,21 @@
     }
 
 
+
+    if('GET_BY_ENTITY' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $eid = $_POST['eid'];
+        $query = "SELECT * FROM $table WHERE eid = '".$eid."' AND end != ''";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
+
     if('GET_ONE' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
