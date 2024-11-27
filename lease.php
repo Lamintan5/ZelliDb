@@ -15,6 +15,50 @@
     }
 
 
+    if (isset($action) && $action === 'UPDATE_COTID') {
+        $lid = $_POST['lid'];
+        $tid = $_POST['tid'];
+    
+        $lid = $conn->real_escape_string($lid);
+        $tid = $conn->real_escape_string($tid);
+    
+        $sql = "SELECT `ctid` FROM $table WHERE lid = '$lid'";
+        $result = $conn->query($sql);
+    
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $ctidField = $row['ctid'];
+    
+            if (empty($ctidField)) {
+                $newCtidField = $tid;
+            } else {
+                $ctidsArray = explode(',', $ctidField);
+
+                if (!in_array($tid, $ctidsArray)) {
+                    $newCtidField = $ctidField . ',' . $tid;
+                } else {
+                    $newCtidField = $ctidField;
+                }
+            }
+    
+            $updateSql = "UPDATE $table SET `ctid` = '$newCtidField' WHERE lid = '$lid'";
+            if ($conn->query($updateSql) === TRUE) {
+                $updSql = "UPDATE payments SET `tid` = '$newCtidField' WHERE lid = '$lid'";
+                if ($conn->query($updSql) === TRUE) {
+                    echo "success";
+                } else {
+                    echo "error" . $conn->error;
+                }
+            } else {
+                echo "error" . $conn->error;
+            }
+        } else {
+            echo "Does not exist";
+        }
+    
+        $conn->close();
+    }
+    
 
     if (isset($action) && $action === 'REMOVE_COTID') {
         $lid = $_POST['lid'];
