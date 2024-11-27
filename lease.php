@@ -15,6 +15,22 @@
     }
 
 
+    if('UPDATE' == $action){
+        $lid = $_POST['lid'];
+        $end = $_POST['end'];
+        $deduct = $_POST['deduct'];
+        $refund = $_POST['refund'];
+        $balance = $_POST['balance'];
+        $sql = "UPDATE $table SET  end = '$end', deduct = '$deduct', refund = '$refund', balance = '$balance' WHERE lid = '$lid'";
+        if ($conn->query($sql) === TRUE) { 
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    }
+
     if('UPDATE_DETAILS' == $action){
         $lid = $_POST['lid'];
         $rent = $_POST['rent'];
