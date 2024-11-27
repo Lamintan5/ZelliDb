@@ -14,6 +14,31 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if('ADD' == $action){
+        $lid = $_POST['lid'];
+        $tid = $_POST['tid'];
+        $eid = $_POST['eid'];
+        $uid = $_POST['uid'];
+        $pid = $_POST['pid'];
+        $rent = $_POST['rent'];
+        $deposit = $_POST['deposit'];
+        $start = $_POST['start'];
+        $end = $_POST['end'];
+
+        $sql = "SELECT lid FROM $table WHERE BINARY lid = '".$lid."'";
+        $result = mysqli_query($db,$sql);
+        $count = mysqli_num_rows($result);
+
+        if($count>=1){
+            echo 'Exists';
+        } else {
+            $sql = "INSERT INTO $table (lid, tid, ctid, eid, uid, pid, rent, deposit, deduct, refund, balance, start, end) 
+            VALUES('$lid','$tid','$tid','$eid','$uid','$pid', '$rent', '$deposit', '', '', '','$start','$end')";
+            $result = $conn->query($sql);
+            echo 'success';
+        }
+        return;
+    }
 
     if('GET_MY' == $action){
         if ($db->connect_errno) {
