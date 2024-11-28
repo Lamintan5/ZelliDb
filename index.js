@@ -1,5 +1,12 @@
 
 
+// Middleware
+app.use(express.json());
+const routes = require("./routes");
+app.use("/api", routes);
+app.use("/uploads", express.static("uploads"));
+
+
 const clients = {};
 
 io.on("connection", (socket) => {
