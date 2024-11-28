@@ -1,5 +1,8 @@
 {
   
+  "scripts": {
+    "dev": "nodemon index"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
