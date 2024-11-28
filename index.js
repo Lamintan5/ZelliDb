@@ -1,3 +1,11 @@
+const { ONE_SIGNAL_CONFIG } = require("./config/app.config.js")
+const pushNotificationService = require("./services/push-notification.services.js");
+const express = require("express");
+const http = require("http");
+const app = express();
+const port = process.env.PORT || 5000;
+const server = http.createServer(app);
+const io = require("socket.io")(server);
 
 
 // Middleware
