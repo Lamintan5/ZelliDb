@@ -275,21 +275,19 @@
         $conn->close();
         return;
     }
-    
-    
 
-    if('UPDATE_UTIL' == $action){
-        $eid = $_POST['eid'];
-        $utilities = $_POST['utilities'];
-        $sql = "UPDATE $table SET utilities = '$utilities' WHERE eid = '$eid'";
-        if ($conn->query($sql) === TRUE) { 
-            echo "success";
-        } else {
-            echo "error";
-        }
-        $conn->close();
-        return;
-    }
+    // if('UPDATE_UTIL' == $action){
+    //     $eid = $_POST['eid'];
+    //     $utilities = $_POST['utilities'];
+    //     $sql = "UPDATE $table SET utilities = '$utilities' WHERE eid = '$eid'";
+    //     if ($conn->query($sql) === TRUE) { 
+    //         echo "success";
+    //     } else {
+    //         echo "error";
+    //     }
+    //     $conn->close();
+    //     return;
+    // }
 
     if('UPDATE' == $action){
         $image = $_FILES['image']['name'];
