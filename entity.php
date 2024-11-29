@@ -13,6 +13,49 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if ('UPDATE_PID' == $action) {
+        $eid = $_POST['eid'];
+        $uid = $_POST['uid'];
+    
+        $tables = ['entity', 'payments', 'lease', 'units', 's-+tars', 'reviews', 'duties']; 
+        $sql = "SELECT `pid` FROM entity WHERE eid = '$eid'";
+        $result = $conn->query($sql);
+    
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $pidField = $row['pid'];
+    
+            if (empty($pidField)) {
+                $newPidField = $uid;
+            } else {
+                $uidsArray = explode(',', $pidField);
+                if (!in_array($uid, $uidsArray)) {
+                    $newPidField = $pidField . ',' . $uid;
+                } else {
+                    $newPidField = $pidField;
+                }
+            }
+    
+            foreach ($tables as $table) {
+                $updateSql = "UPDATE $table SET `pid` = '$newPidField' WHERE eid = '$eid'";
+                if ($conn->query($updateSql) !== TRUE) {
+                    echo "failed";
+                    $conn->close();
+                    return;
+                }
+            }
+    
+            echo "success";
+        } else {
+            echo "Does not exist";
+        }
+    
+        $conn->close();
+        return;
+    }
+
+
+
     if ('REMOVE_PID' == $action) {
         $eid = $_POST['eid'];
         $uid = $_POST['uid'];
