@@ -13,6 +13,46 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if ('UPDATE_ADMIN' == $action) {
+        $eid = $_POST['eid'];
+        $uid = $_POST['uid'];
+
+        $tables = ['entity', 'payments']; 
+    
+        $sql = "SELECT `admin` FROM entity WHERE eid = '$eid'";
+        $result = $conn->query($sql);
+    
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $adminField = $row['admin'];
+    
+            if (empty($adminField)) {
+                $newAdminField = $uid;
+            } else {
+                $uidsArray = explode(',', $adminField);
+                if (!in_array($uid, $uidsArray)) {
+                    $newAdminField = $adminField . ',' . $uid;
+                } else {
+                    $newAdminField = $adminField;
+                }
+            }
+            foreach ($tables as $table) {
+                $updateSql = "UPDATE $table SET `admin` = '$newAdminField' WHERE eid = '$eid'";
+                if ($conn->query($updateSql) !== TRUE) {
+                    echo "failed";
+                    $conn->close();
+                    return;
+                }
+            }
+            echo "success";
+        } else {
+            echo "Does not exist";
+        }
+    
+        $conn->close();
+        return;
+    }
+
     if ('REMOVE_ADMIN' == $action) {
         $eid = $_POST['eid'];
         $uid = $_POST['uid'];
