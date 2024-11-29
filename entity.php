@@ -13,6 +13,61 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if ('REMOVE_ADMIN' == $action) {
+        $eid = $_POST['eid'];
+        $uid = $_POST['uid'];
+    
+        $tables = ['entity','payments']; 
+    
+        $sql = "SELECT `admin` FROM entity WHERE eid = '$eid'";
+        $result = $conn->query($sql);
+    
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $adminField = $row['admin'];
+    
+            if (!empty($adminField)) {
+                $uidsArray = explode(',', $adminField);
+                $uidsArray = array_filter($uidsArray, function($item) use ($uid) {
+                    return $item != $uid;
+                });
+                $newAdminField = implode(',', $uidsArray);
+            } else {
+                $newAdminField = '';
+            }
+
+            foreach ($tables as $table) {
+                $updateSql = "UPDATE $table SET `admin` = '$newAdminField' WHERE eid = '$eid'";
+                if ($conn->query($updateSql) !== TRUE) {
+                    echo "failed";
+                    $conn->close();
+                    return;
+                }
+            }
+        
+            echo "success";
+        } else {
+            echo "Does not exist";
+        }
+    
+        $conn->close();
+        return;
+    }
+    
+    
+
+    if('UPDATE_UTIL' == $action){
+        $eid = $_POST['eid'];
+        $utilities = $_POST['utilities'];
+        $sql = "UPDATE $table SET utilities = '$utilities' WHERE eid = '$eid'";
+        if ($conn->query($sql) === TRUE) { 
+            echo "success";
+        } else {
+            echo "error";
+        }
+        $conn->close();
+        return;
+    }
 
     if('UPDATE' == $action){
         $image = $_FILES['image']['name'];
