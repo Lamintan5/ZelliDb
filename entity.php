@@ -13,6 +13,44 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+   
+    if('ADD' == $action){
+        $image = $_FILES['image']['name'];
+        $eid = $_POST['eid'];
+        $pid = $_POST['pid'];
+        $admin = $_POST['admin'];
+        $title = $_POST['title'];
+        $category = $_POST['category'];
+        $due = $_POST['due'];
+        $late = $_POST['late'];
+        $utilities = $_POST['utilities'];
+        $location = $_POST['location'];
+        
+        $sql = "SELECT eid FROM $table WHERE eid = '".$eid."'";
+        $result = mysqli_query($db,$sql);
+        $count = mysqli_num_rows($result);
+        if($count > 0){
+            echo 'Exists';
+        } else {
+            if (isset($_FILES['image']) && !empty($_FILES['image']['name'])) {
+                $image = $_FILES['image']['name'];
+                $tmp_name = $_FILES['image']['tmp_name'];
+                $imagePath = 'logos/' . $image;
+                move_uploaded_file($tmp_name, $imagePath);
+            } else {
+                $image = $_POST['image']; 
+            }
+            $insert = "INSERT INTO $table(eid,pid,admin,title,category,image,due,late,utilities,location,checked) 
+            VALUES ('".$eid."','".$pid."','".$admin."','".$title."','".$category."','".$image."','".$due."','".$late."', '".$utilities."', '".$location."','true')";
+            $query = mysqli_query($db,$insert);
+            if($query){
+                echo 'Success';
+            } else {
+                echo 'Failed';
+            }
+        }
+
+    }
 
     if('GET' == $action){
         if ($db->connect_errno) {
