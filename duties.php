@@ -14,6 +14,22 @@
     }
 
 
+    if('GET_CURRENT' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $eid = $_POST['eid'];
+        $pid = $_POST['pid'];
+        $query = "SELECT * FROM $table WHERE eid = '".$eid."' AND pid = '".$pid."'";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
+
+
     if('UPDATE' == $action){
         $did = $_POST['did'];
         $duties = $_POST['duties'];  
