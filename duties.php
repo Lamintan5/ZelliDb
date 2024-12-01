@@ -13,6 +13,29 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+    if('ADD' == $action){
+        $did = $_POST['did'];
+        $eid = $_POST['eid'];
+        $pid = $_POST['pid'];
+        $duties = $_POST['duties'];
+
+        $sql = "SELECT eid, pid FROM $table WHERE BINARY eid = '".$eid."' AND pid = '".$pid."'";
+        $result = mysqli_query($db,$sql);
+        $count = mysqli_num_rows($result);
+
+        if($count == 1){
+            echo 'Exists';
+        } else {
+            $insert = "INSERT INTO $table(did,eid,pid,duties,checked)
+            VALUES ('".$did."','".$eid."','".$pid."','".$duties."','true')";
+            $query = mysqli_query($db,$insert);
+            if($query){
+                echo 'Success';
+            } else {
+                echo 'Failed';
+            }
+        }         
+    }
 
     if('GET_MY' == $action){
         if ($db->connect_errno) {
