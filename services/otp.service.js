@@ -5,6 +5,8 @@ const emailServices = require("../services/emailer.service");
 
 async function sendOTP(params, callback){
    
+    var otpMessage = ``;
+
     var model = {
         email: params.email,
         subject: "Registration OTP",
