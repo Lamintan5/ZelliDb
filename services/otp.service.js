@@ -3,6 +3,9 @@ const crypto = require("crypto");
 const key = "Lamintan";
 const emailServices = require("../services/emailer.service");
 
+async function sendOTP(params, callback){
+   
+}
 
 async function verifyOTP(params, callback){
     let [hashValue, expires] = params.hash.split('.');
