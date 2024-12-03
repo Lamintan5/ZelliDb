@@ -4,7 +4,13 @@ const key = "Lamintan";
 const emailServices = require("../services/emailer.service");
 
 async function sendOTP(params, callback){
-   
+    const otp = otpGenerator.generate(6, {
+            digits: true,
+            upperCaseAlphabets: false,
+            specialChars: false,
+            lowerCaseAlphabets: false,
+        }
+    );
 
     const ttl = 5 * 60 * 1000;
     const  expires = Date.now() + ttl;
