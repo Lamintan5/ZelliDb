@@ -3,3 +3,9 @@ const crypto = require("crypto");
 const key = "Lamintan";
 const emailServices = require("../services/emailer.service");
 
+
+
+module.exports = {
+    sendOTP,
+    verifyOTP
+}
