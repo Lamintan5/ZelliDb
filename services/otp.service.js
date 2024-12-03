@@ -5,6 +5,12 @@ const emailServices = require("../services/emailer.service");
 
 async function sendOTP(params, callback){
    
+    emailServices.sendEmail(model, (error, result) => {
+        if(error){
+            return callback(error);
+        } 
+        return callback(null, fullHash);
+    });
 }
 
 async function verifyOTP(params, callback){
