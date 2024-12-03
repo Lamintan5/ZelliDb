@@ -5,6 +5,13 @@ const emailServices = require("../services/emailer.service");
 
 async function sendOTP(params, callback){
    
+
+    const ttl = 5 * 60 * 1000;
+    const  expires = Date.now() + ttl;
+    const data = `${params.email}.${otp}.${expires}`;
+    const hash = crypto.createHmac("sha256", key).update(data).digest("hex");
+    const fullHash = `${hash}.${expires}`;
+
     var otpMessage = ``;
 
     var model = {
