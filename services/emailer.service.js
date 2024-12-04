@@ -1,7 +1,13 @@
 var nodemailer = require('nodemailer');
 
 async function sendEmail(params, callback){
-   
+    var transport = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'billclinton1758@gmail.com',
+            pass: 'tgev djgo aegx vtnr',
+        }
+    });
 
     var mailOptions = {
         from: 'billclinton1758@gmail.com',
