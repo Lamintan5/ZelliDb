@@ -1,5 +1,9 @@
 const otpService = require("../services/otp.service");
 
+exports.otpLogin = (req, res, next) => {
+    
+};
+
 
 exports.verifyOTP = (req, res, next) => {
     otpService.verifyOTP(req.body, (error, results) => {
