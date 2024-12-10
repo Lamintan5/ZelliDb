@@ -40,6 +40,20 @@
         }         
     }
 
+    if('GET_MY' == $action){
+        if ($db->connect_errno) {
+            die("Failed to connect to MySQL: " . $db->connect_error);
+        }
+        $uid = $_POST['uid'];
+        $query = "SELECT * FROM $table WHERE  FIND_IN_SET('" . $uid . "', pid)";
+        $result = $db->query($query);
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode($data);
+    }
+
     if('UPDATE' == $action){
         $bid = $_POST['bid'];
         $businessno = $_POST['businessno'];  
