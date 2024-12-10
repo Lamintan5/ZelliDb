@@ -21,6 +21,7 @@
         $businessno = $_POST['businessno'];
         $account = $_POST['account'];
         $type = $_POST['type'];
+        $checked = $_POST['checked'];
 
         $sql = "SELECT bid FROM $table WHERE bid = '".$bid."'";
         $result = mysqli_query($db,$sql);
@@ -29,8 +30,8 @@
         if($count == 1){
             echo 'Exists';
         } else {
-            $insert = "INSERT INTO $table(bid,eid,pid,bill,businessno,account,type)
-            VALUES ('".$bid."','".$eid."','".$pid."','".$bill."', '".$businessno."', '".$account."' ,'".$type."')";
+            $insert = "INSERT INTO $table(bid,eid,pid,bill,businessno,account,type,checked)
+            VALUES ('".$bid."','".$eid."','".$pid."','".$bill."', '".$businessno."', '".$account."' ,'".$type."','true')";
             $query = mysqli_query($db,$insert);
             if($query){
                 echo 'Success';
