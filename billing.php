@@ -55,59 +55,7 @@
         echo json_encode($data);
     }
 
-    if('GET_CURRENT' == $action){
-        if ($db->connect_errno) {
-            die("Failed to connect to MySQL: " . $db->connect_error);
-        }
-        $eid = $_POST['eid'];
-        $query = "SELECT * FROM $table WHERE eid = '".$eid."'";
-        $result = $db->query($query);
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
-        }
-        echo json_encode($data);
-    }
-
-
-    if (isset($action) && $action === 'UPDATE_ACCOUNT') {
-        $bid = $_POST['bid'];
-        $accountno = $_POST['accountno'];
     
-        $bid = $conn->real_escape_string($bid);
-        $accountno = $conn->real_escape_string($accountno);
-    
-        $sql = "SELECT `accountno` FROM $table WHERE bid = '$bid'";
-        $result = $conn->query($sql);
-    
-        if ($result && $result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $accField = $row['accountno'];
-    
-            if (empty($accField)) {
-                $newAccField = $accountno;
-            } else {
-                $accsArray = explode('*', $accField);
-
-                if (!in_array($accountno, $accsArray)) {
-                    $newAccField = $accField . '*' . $accountno;
-                } else {
-                    $newAccField = $accField;
-                }
-            }
-    
-            $updateSql = "UPDATE $table SET `accountno` = '$newAccField' WHERE bid = '$bid'";
-            if ($conn->query($updateSql) === TRUE) {
-                echo "success";
-            } else {
-                echo "error" . $conn->error;
-            }
-        } else {
-            echo "Does not exist";
-        }
-    
-        $conn->close();
-    }
 
 
     if('UPDATE' == $action){
