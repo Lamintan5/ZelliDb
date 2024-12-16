@@ -109,7 +109,55 @@
         $conn->close();
     }
 
+    if (isset($action) && $action === 'REMOVE_ACCESS') {
+        $bid = $_POST['bid'];
+        $access = $_POST['access'];
     
+        // Sanitize inputs
+        $bid = $conn->real_escape_string($bid);
+        // $access = $conn->real_escape_string($access);
+    
+        // Fetch current access
+        $sql = "SELECT `access` FROM $table WHERE bid = '$bid'";
+        $result = $conn->query($sql);
+    
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $accField = $row['access'];
+    
+            if (!empty($accField)) {
+                $accsArray = explode('*', $accField);
+    
+                // Check if the access exists and remove it
+                if (in_array($access, $accsArray)) {
+                    $accsArray = array_filter($accsArray, function ($item) use ($access) {
+                        return $item !== $access;
+                    });
+    
+                    // Join the remaining access values back into a string
+                    $newAccField = implode('*', $accsArray);
+                } else {
+                    echo "Access not found";
+                    $conn->close();
+                    exit;
+                }
+    
+                // Update the database
+                $updateSql = "UPDATE $table SET `access` = '$newAccField' WHERE bid = '$bid'";
+                if ($conn->query($updateSql) === TRUE) {
+                    echo "success";
+                } else {
+                    echo "failed" . $conn->error;
+                }
+            } else {
+                echo "No access to remove";
+            }
+        } else {
+            echo "Does not exist";
+        }
+    
+        $conn->close();
+    }
 
     if('UPDATE' == $action){
         $bid = $_POST['bid'];
