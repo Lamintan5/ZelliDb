@@ -346,6 +346,100 @@
     }
 
 
+    if ('ADD_UTIL' == $action) {
+        $eid = $_POST['eid'];
+        $utilities = $_POST['utilities'];
+    
+        // Sanitize inputs
+        $eid = $conn->real_escape_string($eid);
+        $utilities = $conn->real_escape_string($utilities);
+    
+        // Check if the entity exists
+        $checkSql = "SELECT utilities FROM $table WHERE eid = '$eid'";
+        $result = $conn->query($checkSql);
+    
+        if ($result->num_rows == 0) {
+            echo "Does not exist";
+        } else {
+            $row = $result->fetch_assoc();
+            $existingUtilities = $row['utilities'];
+    
+            // Split existing utilities into an array
+            $existingArray = !empty($existingUtilities) ? explode('&', $existingUtilities) : [];
+    
+            // Split incoming utilities into an array
+            $newArray = explode('&', $utilities);
+    
+            // Check if any of the new utilities already exist
+            $alreadyExists = array_intersect($newArray, $existingArray);
+    
+            if (!empty($alreadyExists)) {
+                echo "Exist";
+            } else {
+                // Add new utilities to the existing array
+                $updatedArray = array_merge($existingArray, $newArray);
+    
+                // Remove duplicates and rejoin into a string
+                $updatedUtilities = implode('&', array_unique($updatedArray));
+    
+                // Update the database
+                $updateSql = "UPDATE $table SET utilities = '$updatedUtilities' WHERE eid = '$eid'";
+                if ($conn->query($updateSql) === TRUE) {
+                    echo "success";
+                } else {
+                    echo "error: " . $conn->error;
+                }
+            }
+        }
+    
+        $conn->close();
+        return;
+    }
+    
+
+
+    if ('UPDATE_ADMIN' == $action) {
+        $eid = $_POST['eid'];
+        $uid = $_POST['uid'];
+
+        $tables = ['entity', 'payments']; 
+    
+        $sql = "SELECT `admin` FROM entity WHERE eid = '$eid'";
+        $result = $conn->query($sql);
+    
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $adminField = $row['admin'];
+    
+            if (empty($adminField)) {
+                $newAdminField = $uid;
+            } else {
+                $uidsArray = explode(',', $adminField);
+                if (!in_array($uid, $uidsArray)) {
+                    $newAdminField = $adminField . ',' . $uid;
+                } else {
+                    $newAdminField = $adminField;
+                }
+            }
+            foreach ($tables as $table) {
+                $updateSql = "UPDATE $table SET `admin` = '$newAdminField' WHERE eid = '$eid'";
+                if ($conn->query($updateSql) !== TRUE) {
+                    echo "failed";
+                    $conn->close();
+                    return;
+                }
+            }
+            echo "success";
+        } else {
+            echo "Does not exist";
+        }
+    
+        $conn->close();
+        return;
+    }
+    
+
+
 
     if('DELETE' == $action){
         $eid = $_POST['eid'];
