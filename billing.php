@@ -70,37 +70,37 @@
     }
 
 
-    if (isset($action) && $action === 'UPDATE_ACCOUNT') {
+    if (isset($action) && $action === 'UPDATE_ACCESS') {
         $bid = $_POST['bid'];
-        $accountno = $_POST['accountno'];
+        $access = $_POST['access'];
     
         $bid = $conn->real_escape_string($bid);
-        $accountno = $conn->real_escape_string($accountno);
+        $access = $conn->real_escape_string($access);
     
-        $sql = "SELECT `accountno` FROM $table WHERE bid = '$bid'";
+        $sql = "SELECT `access` FROM $table WHERE bid = '$bid'";
         $result = $conn->query($sql);
     
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            $accField = $row['accountno'];
+            $accField = $row['access'];
     
             if (empty($accField)) {
-                $newAccField = $accountno;
+                $newAccField = $access;
             } else {
                 $accsArray = explode('*', $accField);
 
-                if (!in_array($accountno, $accsArray)) {
-                    $newAccField = $accField . '*' . $accountno;
+                if (!in_array($access, $accsArray)) {
+                    $newAccField = $accField . '*' . $access;
                 } else {
                     $newAccField = $accField;
                 }
             }
     
-            $updateSql = "UPDATE $table SET `accountno` = '$newAccField' WHERE bid = '$bid'";
+            $updateSql = "UPDATE $table SET `access` = '$newAccField' WHERE bid = '$bid'";
             if ($conn->query($updateSql) === TRUE) {
                 echo "success";
             } else {
-                echo "error" . $conn->error;
+                echo "failed" . $conn->error;
             }
         } else {
             echo "Does not exist";
@@ -109,6 +109,7 @@
         $conn->close();
     }
 
+    
 
     if('UPDATE' == $action){
         $bid = $_POST['bid'];
