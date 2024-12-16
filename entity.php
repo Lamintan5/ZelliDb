@@ -387,7 +387,7 @@
                 if ($conn->query($updateSql) === TRUE) {
                     echo "success";
                 } else {
-                    echo "error: " . $conn->error;
+                    echo "failed: " . $conn->error;
                 }
             }
         }
