@@ -12,7 +12,6 @@
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
-
    
     if('ADD' == $action){
         $image = $_FILES['image']['name'];
@@ -94,7 +93,6 @@
         echo json_encode($data);
     }
 
-
     if('GET_ALL' == $action){
         if ($db->connect_errno) {
             die("Failed to connect to MySQL: " . $db->connect_error);
@@ -107,9 +105,6 @@
         }
         echo json_encode($data);
     }
-
-  
-
 
     if ('UPDATE_PID' == $action) {
         $eid = $_POST['eid'];
@@ -151,8 +146,6 @@
         $conn->close();
         return;
     }
-
-
 
     if ('REMOVE_PID' == $action) {
         $eid = $_POST['eid'];
@@ -320,7 +313,6 @@
         return;
     }
 
-
     if('UPDATE_UTIL' == $action){
         $eid = $_POST['eid'];
         $utilities = $_POST['utilities'];
@@ -344,7 +336,6 @@
         $conn->close();
         return;
     }
-
 
     if ('ADD_UTIL' == $action) {
         $eid = $_POST['eid'];
@@ -388,8 +379,6 @@
         return;
     }
     
-
-
     if ('UPDATE_ADMIN' == $action) {
         $eid = $_POST['eid'];
         $uid = $_POST['uid'];
@@ -430,9 +419,6 @@
         return;
     }
     
-
-
-
     if('DELETE' == $action){
         $eid = $_POST['eid'];
         $sql = "DELETE FROM $table WHERE eid = '$eid'";
@@ -444,5 +430,4 @@
         $conn->close();
         return;
     }
-    
 ?>
