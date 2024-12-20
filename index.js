@@ -8,6 +8,8 @@ const server = http.createServer(app);
 const io = require("socket.io")(server);
 const Mpesa = require("mpesa-api").Mpesa;
 const axios = require('axios');
+const moment = require("moment");
+const fs = require("fs");
 
 
 // Middleware
@@ -187,101 +189,157 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", (_) => {
         console.log("Disconnected. Reconnecting :", new Date().toLocaleTimeString().substring(0, 5));
-        // Implement your reconnection logic here
+       
     });
 
     socket.on("connect_error", (err) => {
         console.log("Connection error: ", err);
-        // Implement detailed logging or error handling here
     });
 
     console.log(`${socket.connected}: ${new Date().toLocaleTimeString().substring(0, 5)}`);
 });
 
-const credentials = {
-    clientKey: 'oIdnTxYqW5AfZXTD7BgFnm3OxflAoAIcpKeHvySzdmHnfmbI',
-    clientSecret: 'Rl7I9wF8ANexFDLDXw3RpYKaD5K0fPxvsF23gWrMMHCzVLY7XnYc0VDwNoo26Ehp',
-    initiatorPassword: 'Safaricom999',
-    securityCredential: "aM8d5+FtNsE5SFy0Nk7o9dX9MYkHZGKq1MQ64UZC6wqWcvUcAyPjvst2aYsWZJ5EIvi6gABfeCz5t7W6SZbCABL3jGGyYwnK0BmZI/CSMMu+S5j9KQ63Z07tMnMgFMS5Y3NzlB27IU05vWQD1B5cboC+mY4NkNBkAnBi3FggPj9PW1+BX1UhnelzcAvmvIC4ZclU8ssywMYqDBiOMmGy2X4x0AzdqHqb0x7KJez5hdvob6fNryz9bKrMwf1t2/k+grIMrxMoC5V+oMyYSRBtG4TAxW2gve1TFPW4jQ+JCHVvUu9DfBIfCHusRgXdPC2o34yXAc6hdBUGbHGnQp3TEA==",
-    certificatePath: null,
-    environment: "sandbox",
-};
+//ACCESS TOKEN ROUTE
+app.get("/api/access_token", (req, res) => {
+    getAccessToken()
+      .then((accessToken) => {
+        res.send(accessToken);
+      })
+      .catch(console.log);
+});
 
 async function getAccessToken() {
-    const url = `https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials`;
-    const headers = {
-        'Authorization': `Basic ${Buffer.from(`${credentials.clientKey}:${credentials.clientSecret}`).toString('base64')}`,
-    };
-
+    const consumer_key = "oIdnTxYqW5AfZXTD7BgFnm3OxflAoAIcpKeHvySzdmHnfmbI"; 
+    const consumer_secret = "Rl7I9wF8ANexFDLDXw3RpYKaD5K0fPxvsF23gWrMMHCzVLY7XnYc0VDwNoo26Ehp";
+    const url =
+      "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+    const auth =
+      "Basic " +
+      new Buffer.from(consumer_key + ":" + consumer_secret).toString("base64");
+  
     try {
-        const response = await axios.get(url, { headers });
-        return response.data.access_token; // Token to be used in further requests
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: auth,
+        },
+      });
+     
+      const dataresponse = response.data;
+      const accessToken = dataresponse.access_token;
+      return accessToken;
     } catch (error) {
-        console.error('Error getting access token:', error);
-        throw new Error('Failed to get access token');
+      throw error;
     }
 }
 
-const mpesa = new Mpesa(credentials, {
-    timeout: 5000,
+// REGISTER URL FOR C2B
+app.get("/api/registerurl", (req, resp) => {
+    getAccessToken()
+      .then((accessToken) => {
+        const url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
+        const auth = "Bearer " + accessToken;
+        axios
+          .post(
+            url,
+            {
+              ShortCode: "174379",
+              ResponseType: "Complete",
+              ConfirmationURL: "https://more-crow-hardly.ngrok-free.app/api/confirmation",
+              ValidationURL: "http://more-crow-hardly.ngrok-free.app/api/validation",
+            },
+            {
+              headers: {
+                Authorization: auth,
+              },
+            }
+          )
+          .then((response) => {
+            resp.status(200).json(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+            resp.status(500).send("❌ Request failed");
+          });
+      })
+      .catch(console.log);
 });
 
-async function lipaNaMpesaOnline(accessToken, amount, phoneNumber, accountNumber, businessNumber) {
-    const url = `https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest`;
-    const headers = {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-    };
-
-    const requestBody = {
-        BusinessShortCode: businessNumber,
-        Amount: amount,
-        PartyA: phoneNumber,
-        PartyB: businessNumber,
-        PhoneNumber: phoneNumber,
-        CallBackURL: `https://more-crow-hardly.ngrok-free.app/api/mpesa-callback`,
-        AccountReference: accountNumber,
-        TransactionDesc: "Payment",
-        TransactionType: "CustomerPayBillOnline",
-    };
-
-    try {
-        const response = await axios.post(url, requestBody, { headers });
-        return response.data; // Handle the response accordingly
-    } catch (error) {
-        console.error('Error initiating payment:', error);
-        throw new Error('Payment initiation failed');
-    }
-}
-
-// API endpoint to handle the payment initiation
-app.post("/api/pay", async (req, res) => {
-    const { amount, phoneNumber, accountNumber, businessNumber } = req.body;
-
-    try {
-        const accessToken = await getAccessToken(); // Get the access token
-        const response = await lipaNaMpesaOnline(accessToken, amount, phoneNumber, accountNumber, businessNumber);
-        return res.status(200).json({ message: "Payment initiated", data: response });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Payment initiation failed", error: error.message });
-    }
+//MPESA STK PUSH ROUTE
+app.get("/api/stkpush", (req, res) => {
+    getAccessToken()
+      .then((accessToken) => {
+        const url =
+          "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+        const auth = "Bearer " + accessToken;
+        const timestamp = moment().format("YYYYMMDDHHmmss");
+        const password = new Buffer.from(
+          "174379" +
+            "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919" +
+            timestamp
+        ).toString("base64");
+  
+        axios
+          .post(
+            url,
+            {
+              BusinessShortCode: "174379",
+              Password: password,
+              Timestamp: timestamp,
+              TransactionType: "CustomerPayBillOnline",
+              Amount: "1",
+              PartyA: "254113671997", 
+              PartyB: "174379",
+              PhoneNumber: "254113671997",
+              CallBackURL: "https://more-crow-hardly.ngrok-free.app/api/callback",
+              AccountReference: "TNT010310",
+              TransactionDesc: "Mpesa Daraja API stk push test",
+            },
+            {
+              headers: {
+                Authorization: auth,
+              },
+            }
+          )
+          .then((response) => {
+            res.send("Request is successful done ✔✔. Please enter mpesa pin to complete the transaction");
+          })
+          .catch((error) => {
+            console.log(error);
+            res.status(500).send("❌ Request failed");
+          });
+      })
+      .catch(console.log);
 });
+  
+//STK PUSH CALLBACK ROUTE
+app.post("/api/callback", (req, res) => {
+    console.log("STK PUSH CALLBACK");
 
+    const CheckoutRequestID = req.body.Body.stkCallback.CheckoutRequestID;
+    const ResultCode = req.body.Body.stkCallback.ResultCode;
+    const json = JSON.stringify(req.body);
 
-app.post("/api/mpesa-callback", (req, res) => {
-    const { Body } = req.body;
+    fs.writeFile("stkcallback.json", json, "utf8", function (err) {
+        if (err) {
+            return console.log("Error writing JSON file:", err);
+        }
+        console.log("STK PUSH CALLBACK JSON FILE SAVED");
+    });
 
-    if (Body.stkCallback.ResultCode === 0) {
-        const result = Body.stkCallback.CallbackMetadata.Item;
-        io.emit("payment-status", { status: "success", result });
-    } else {
-        io.emit("payment-status", { status: "failed", message: Body.stkCallback.ResultDesc });
-    }
-
-    res.status(200).send("Callback received");
+    console.log(req.body);
+    res.status(200).json({ message: "Callback received successfully" });
 });
-
+  
+app.get("/api/confirmation", (req, res) => {
+  console.log("All transaction will be sent to this URL");
+  console.log(req.body);
+});
+  
+app.get("/api/validation", (req, resp) => {
+   console.log("Validating payment");
+   console.log(req.body);
+});
+  
 app.route("/check").get((req, res) => {
     return res.json("Your app is working fine");
 });
