@@ -10,31 +10,46 @@ const Mpesa = require("mpesa-api").Mpesa;
 const axios = require('axios');
 const moment = require("moment");
 const fs = require("fs");
+const routes = require("./routes");
+const mysql = require("mysql2");
+
 
 
 // Middleware
 app.use(express.json());
-const routes = require("./routes");
 app.use("/api", routes);
 app.use("/uploads", express.static("uploads"));
-
-
 const clients = {};
+var paymentmodel;
+var stkToken;
 
 io.on("connection", (socket) => {
     console.log("connected");
-    console.log(socket.id, "has joined");
+    // console.log(socket.id, "has joined");
 
     socket.on("signin", (id) => {
         console.log(`User ${id} has signed in`);
         clients[id] = socket;
-        console.log("Connected clients:", clients);
+        // console.log("Connected clients:", clients);
     });
 
     socket.on("signout", (id) => {
         console.log(`User ${id} has signed out`);
         delete clients[id];
-        console.log("Connected clients:", clients);
+        // console.log("Connected clients:", clients);
+    });
+
+    socket.on("pay", (pay)=>{
+      console.log(pay);
+      let targetId = pay.targetId;
+
+      if(clients[targetId]){
+         clients[targetId].emit("pay", pay); 
+         console.log(`Pay response sent ${targetId}`);
+      } else {
+        console.log(`User ${targetId} not found`);
+      }
+      
     });
     
     socket.on("message", (msg)=>{
@@ -86,18 +101,16 @@ io.on("connection", (socket) => {
         });
     });
 
-
-
     socket.on("group", (msg) => {
-    console.log("Received group message:", msg);
+        console.log("Received group message:", msg);
 
-    let targetIds = msg.targetId || [];
-    let messageText = msg.message;
-    let title = msg.title;
-    let recipientToken = msg.token;
-    let profile = msg.profile;
-    let image = msg.path;
-    let username = msg.username;
+        let targetIds = msg.targetId || [];
+        let messageText = msg.message;
+        let title = msg.title;
+        let recipientToken = msg.token;
+        let profile = msg.profile;
+        let image = msg.path;
+        let username = msg.username;
 
         targetIds.forEach(targetId => {
             if (clients[targetId]) {
@@ -138,7 +151,6 @@ io.on("connection", (socket) => {
         });
     });
     
-
     socket.on("notif", (msg)=>{
         console.log(msg);
         let targetIds = msg.pid || [];
@@ -189,7 +201,6 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", (_) => {
         console.log("Disconnected. Reconnecting :", new Date().toLocaleTimeString().substring(0, 5));
-       
     });
 
     socket.on("connect_error", (err) => {
@@ -200,136 +211,233 @@ io.on("connection", (socket) => {
 });
 
 //ACCESS TOKEN ROUTE
-app.get("/api/access_token", (req, res) => {
-    getAccessToken()
-      .then((accessToken) => {
-        res.send(accessToken);
-      })
-      .catch(console.log);
+app.get("/api/access_token", async (req, res) => {
+  try {
+    const accessTokenResponse = await getAccessToken();
+    res.status(200).json(accessTokenResponse); // Return the full response body
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch access token",
+      error: error.message,
+    });
+  }
 });
 
+
 async function getAccessToken() {
-    const consumer_key = "oIdnTxYqW5AfZXTD7BgFnm3OxflAoAIcpKeHvySzdmHnfmbI"; 
-    const consumer_secret = "Rl7I9wF8ANexFDLDXw3RpYKaD5K0fPxvsF23gWrMMHCzVLY7XnYc0VDwNoo26Ehp";
-    const url =
-      "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-    const auth =
-      "Basic " +
-      new Buffer.from(consumer_key + ":" + consumer_secret).toString("base64");
-  
-    try {
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: auth,
-        },
-      });
-     
-      const dataresponse = response.data;
-      const accessToken = dataresponse.access_token;
-      return accessToken;
-    } catch (error) {
-      throw error;
-    }
+  const consumer_key = "oIdnTxYqW5AfZXTD7BgFnm3OxflAoAIcpKeHvySzdmHnfmbI";
+  const consumer_secret = "Rl7I9wF8ANexFDLDXw3RpYKaD5K0fPxvsF23gWrMMHCzVLY7XnYc0VDwNoo26Ehp";
+  const url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+  const auth = "Basic " + Buffer.from(consumer_key + ":" + consumer_secret).toString("base64");
+
+  try {
+    const response = await axios.get(url, {
+      headers: { Authorization: auth },
+    });
+    return response.data; // Return the full response body
+  } catch (error) {
+    // Return error details for better debugging
+    return {
+      success: false,
+      message: error.message,
+      details: error.response ? error.response.data : null,
+    };
+  }
 }
 
 // REGISTER URL FOR C2B
-app.get("/api/registerurl", (req, resp) => {
-    getAccessToken()
-      .then((accessToken) => {
-        const url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
-        const auth = "Bearer " + accessToken;
-        axios
-          .post(
-            url,
-            {
-              ShortCode: "174379",
-              ResponseType: "Complete",
-              ConfirmationURL: "https://more-crow-hardly.ngrok-free.app/api/confirmation",
-              ValidationURL: "http://more-crow-hardly.ngrok-free.app/api/validation",
-            },
-            {
-              headers: {
-                Authorization: auth,
-              },
-            }
-          )
-          .then((response) => {
-            resp.status(200).json(response.data);
-          })
-          .catch((error) => {
-            console.log(error);
-            resp.status(500).send("❌ Request failed");
-          });
-      })
-      .catch(console.log);
+app.post("/api/registerurl", async (req, res) => {
+  try {
+    const { accessToken, ShortCode } = req.body;
+
+    // Validate the required parameters
+    if (!accessToken || !ShortCode) {
+      return res.status(400).json({
+        success: false,
+        message: "Access token and ShortCode are required.",
+      });
+    }
+
+    const url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl";
+    const auth = "Bearer " + accessToken;
+
+    const payload = {
+      ShortCode,
+      ResponseType: "Complete",
+      ConfirmationURL: "https://more-crow-hardly.ngrok-free.app/api/confirmation",
+      ValidationURL: "http://more-crow-hardly.ngrok-free.app/api/validation",
+    };
+
+    const response = await axios.post(url, payload, {
+      headers: { Authorization: auth },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("Error in registerUrl:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to register URL",
+      details: error.response ? error.response.data : null,
+    });
+  }
 });
 
 //MPESA STK PUSH ROUTE
-app.get("/api/stkpush", (req, res) => {
-    getAccessToken()
-      .then((accessToken) => {
-        const url =
-          "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
-        const auth = "Bearer " + accessToken;
-        const timestamp = moment().format("YYYYMMDDHHmmss");
-        const password = new Buffer.from(
-          "174379" +
-            "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919" +
-            timestamp
-        ).toString("base64");
-  
-        axios
-          .post(
-            url,
-            {
-              BusinessShortCode: "174379",
-              Password: password,
-              Timestamp: timestamp,
-              TransactionType: "CustomerPayBillOnline",
-              Amount: "1",
-              PartyA: "254113671997", 
-              PartyB: "174379",
-              PhoneNumber: "254113671997",
-              CallBackURL: "https://more-crow-hardly.ngrok-free.app/api/callback",
-              AccountReference: "TNT010310",
-              TransactionDesc: "Mpesa Daraja API stk push test",
-            },
-            {
-              headers: {
-                Authorization: auth,
-              },
-            }
-          )
-          .then((response) => {
-            res.send("Request is successful done ✔✔. Please enter mpesa pin to complete the transaction");
-          })
-          .catch((error) => {
-            console.log(error);
-            res.status(500).send("❌ Request failed");
-          });
-      })
-      .catch(console.log);
-});
-  
-//STK PUSH CALLBACK ROUTE
-app.post("/api/callback", (req, res) => {
-    console.log("STK PUSH CALLBACK");
+app.post("/api/stkpush", async (req, res) => {
+  try {
+    const { accessToken, BusinessShortCode, Amount, PhoneNumber, AccountReference, paymodel } = req.body;
+    
+    if (!accessToken || !BusinessShortCode || !Amount || !PhoneNumber || !AccountReference) {
+      return res.status(400).json({
+        success: false,
+        message: "AccessToken, BusinessShortCode, Amount, AccountReference and PhoneNumber are required.",
+      });
+    }
+    stkToken = accessToken;
+    paymentmodel = paymodel
+    
+    const url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+    const auth = "Bearer " + accessToken;
+    const timestamp = moment().format("YYYYMMDDHHmmss");
+    const password = Buffer.from(
+      BusinessShortCode +
+        "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919" +
+        timestamp
+    ).toString("base64");
 
-    const CheckoutRequestID = req.body.Body.stkCallback.CheckoutRequestID;
-    const ResultCode = req.body.Body.stkCallback.ResultCode;
-    const json = JSON.stringify(req.body);
+    const payload = {
+      BusinessShortCode:BusinessShortCode,
+      Password: password,
+      Timestamp: timestamp,
+      TransactionType: "CustomerPayBillOnline",
+      Amount:Amount,
+      PartyA: PhoneNumber,
+      PartyB: BusinessShortCode,
+      PhoneNumber: PhoneNumber,
+      CallBackURL: "https://more-crow-hardly.ngrok-free.app/api/callback",
+      AccountReference:AccountReference,
+      TransactionDesc: "Mpesa Daraja API STK Push test",
+    };
 
-    fs.writeFile("stkcallback.json", json, "utf8", function (err) {
-        if (err) {
-            return console.log("Error writing JSON file:", err);
-        }
-        console.log("STK PUSH CALLBACK JSON FILE SAVED");
+    const response = await axios.post(url, payload, {
+      headers: {
+        Authorization: auth,
+      },
     });
 
-    console.log(req.body);
-    res.status(200).json({ message: "Callback received successfully" });
+    res.status(200).json({
+      success: true,
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("Error response from Mpesa API:", error.response?.data || error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to initiate STK Push",
+      details: error.response ? error.response.data : error.message,
+    });
+  }
 });
-  
+
+//STK PUSH CALLBACK ROUTE
+const db = mysql.createConnection({
+  host: "0.0.0.0", 
+  user: "root", 
+  password: "", 
+  database: "zelli", 
+});
+
+db.connect((err) => {
+  if (err) {
+    console.error("Error connecting to the database:", err);
+  } else {
+    console.log("Connected to the database.");
+  }
+});
+
+app.post("/api/callback", (req, res) => {
+  const CheckoutRequestID = req.body.Body.stkCallback.CheckoutRequestID;
+  const ResultCode = req.body.Body.stkCallback.ResultCode;
+  const ResultDesc = req.body.Body.stkCallback.ResultDesc;
+  const callbackData = req.body.Body.stkCallback;
+  let mpesaReceiptNumber = null;
+
+  console.log("Full Callback Body: ", JSON.stringify(req.body, null, 2));
+
+  if (ResultCode === 0 && callbackData.CallbackMetadata) {
+    const items = callbackData.CallbackMetadata.Item;
+    const receipt = items.find((item) => item.Name === "MpesaReceiptNumber");
+    mpesaReceiptNumber = receipt ? receipt.Value : null;
+    paymentmodel["payid"] = mpesaReceiptNumber;
+  }
+
+  const pay = {
+    payid: mpesaReceiptNumber,
+    accessToken: stkToken,
+    status: ResultCode === 0 ? "Success" : "Failed",
+    targetId: paymentmodel["payerid"],
+    resultDesc: ResultDesc,
+  };
+
+  if (clients[pay.targetId]) {
+    clients[pay.targetId].emit("pay", pay);
+  } else {
+    console.log(`User1 ${pay.targetId} not found`);
+  }
+
+  if (ResultCode === 0) {
+    const json = JSON.stringify(req.body, null, 2);
+    fs.writeFile("stkcallback.json", json, "utf8", function (err) {
+      if (err) {
+        return console.log("Error writing JSON file:", err);
+      }
+      console.log("STK PUSH CALLBACK JSON FILE SAVED");
+    });
+
+    const { payid, pid, admin, tid, lid, eid, uid, payerid, amount, balance, method, type, time, current, checked } = paymentmodel;
+    const query = `
+      INSERT INTO payments (
+        payid, pid, admin, tid, lid, eid, uid, payerid, amount, balance, method, type, time, current, checked
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [payid, pid, admin, tid, lid, eid, uid, payerid, amount, balance, method, type, time, current, checked];
+
+    db.query(query, values, (err, result) => {
+      if (err) {
+        console.error("Error inserting payment into database:", err);
+      } else {
+        console.log("Payment inserted successfully:", result);
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Payment was successful. Callback data saved.",
+      CheckoutRequestID: CheckoutRequestID,
+      ResultDesc: ResultDesc,
+    });
+  } else {
+    
+    res.status(400).json({
+      success: false,
+      message: "Payment failed.",
+      CheckoutRequestID: CheckoutRequestID,
+      ResultCode: ResultCode,
+      ResultDesc: ResultDesc,
+      errorDetails: req.body,
+    });
+  }
+});
+
 app.get("/api/confirmation", (req, res) => {
   console.log("All transaction will be sent to this URL");
   console.log(req.body);
