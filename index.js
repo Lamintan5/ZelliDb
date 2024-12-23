@@ -14,7 +14,6 @@ const routes = require("./routes");
 const mysql = require("mysql2");
 
 
-
 // Middleware
 app.use(express.json());
 app.use("/api", routes);
@@ -214,7 +213,7 @@ io.on("connection", (socket) => {
 app.get("/api/access_token", async (req, res) => {
   try {
     const accessTokenResponse = await getAccessToken();
-    res.status(200).json(accessTokenResponse); // Return the full response body
+    res.status(200).json(accessTokenResponse); 
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -224,7 +223,6 @@ app.get("/api/access_token", async (req, res) => {
     });
   }
 });
-
 
 async function getAccessToken() {
   const consumer_key = "oIdnTxYqW5AfZXTD7BgFnm3OxflAoAIcpKeHvySzdmHnfmbI";
@@ -300,8 +298,9 @@ app.post("/api/stkpush", async (req, res) => {
         message: "AccessToken, BusinessShortCode, Amount, AccountReference and PhoneNumber are required.",
       });
     }
+
     stkToken = accessToken;
-    paymentmodel = paymodel
+    paymentmodel = paymodel;
     
     const url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
     const auth = "Bearer " + accessToken;
@@ -395,6 +394,7 @@ app.post("/api/callback", (req, res) => {
 
   if (ResultCode === 0) {
     const json = JSON.stringify(req.body, null, 2);
+
     fs.writeFile("stkcallback.json", json, "utf8", function (err) {
       if (err) {
         return console.log("Error writing JSON file:", err);
@@ -426,7 +426,7 @@ app.post("/api/callback", (req, res) => {
       ResultDesc: ResultDesc,
     });
   } else {
-    
+
     res.status(400).json({
       success: false,
       message: "Payment failed.",
