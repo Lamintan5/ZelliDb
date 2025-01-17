@@ -18,6 +18,7 @@ const mysql = require("mysql2");
 app.use(express.json());
 app.use("/api", routes);
 app.use("/uploads", express.static("uploads"));
+const router = express.Router();
 const clients = {};
 var paymentmodel;
 var stkToken;
@@ -225,8 +226,8 @@ app.get("/api/access_token", async (req, res) => {
 });
 
 async function getAccessToken() {
-  const consumer_key = "oIdnTxYqW5AfZXTD7BgFnm3OxflAoAIcpKeHvySzdmHnfmbI";
-  const consumer_secret = "Rl7I9wF8ANexFDLDXw3RpYKaD5K0fPxvsF23gWrMMHCzVLY7XnYc0VDwNoo26Ehp";
+  const consumer_key = "hVRuJJ40jpdmyLKDGtOb6skz7d29umiKV7Y7GvZVKAb3Db6C";
+  const consumer_secret = "YhOWHhOygkkQCVCWvYNqHbuGSMQ89laTGYINuYh5mbvPVwNyzA19C3BxnAMLAkZK";
   const url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
   const auth = "Basic " + Buffer.from(consumer_key + ":" + consumer_secret).toString("base64");
 
@@ -265,7 +266,7 @@ app.post("/api/registerurl", async (req, res) => {
       ShortCode,
       ResponseType: "Complete",
       ConfirmationURL: "https://more-crow-hardly.ngrok-free.app/api/confirmation",
-      ValidationURL: "http://more-crow-hardly.ngrok-free.app/api/validation",
+      ValidationURL: "https://more-crow-hardly.ngrok-free.app/api/validation",
     };
 
     const response = await axios.post(url, payload, {
@@ -363,6 +364,8 @@ db.connect((err) => {
 });
 
 app.post("/api/callback", (req, res) => {
+  console.log("Response", req.body);
+
   const CheckoutRequestID = req.body.Body.stkCallback.CheckoutRequestID;
   const ResultCode = req.body.Body.stkCallback.ResultCode;
   const ResultDesc = req.body.Body.stkCallback.ResultDesc;
@@ -371,7 +374,7 @@ app.post("/api/callback", (req, res) => {
 
   console.log("Full Callback Body: ", JSON.stringify(req.body, null, 2));
 
-  if (ResultCode === 0 && callbackData.CallbackMetadata) {
+  if (ResultCode === 0) {
     const items = callbackData.CallbackMetadata.Item;
     const receipt = items.find((item) => item.Name === "MpesaReceiptNumber");
     mpesaReceiptNumber = receipt ? receipt.Value : null;
