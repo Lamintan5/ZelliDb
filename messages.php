@@ -1,17 +1,9 @@
 <?php
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "zelli";
-    $table = "messages";
+   include 'db_config.php';
 
-    $action = $_POST['action'];
-    $db = mysqli_connect('localhost','root','','zelli');
-    $conn = new mysqli($servername, $username, $password, $dbname);
+   $table = "messages";
 
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+   $action = $_POST['action'];
 
     if('ADD' == $action){
         $image = $_FILES['image']['name'];

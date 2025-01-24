@@ -1,17 +1,9 @@
 <?php
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "zelli";
+    include 'db_config.php';
+
     $table = "duties";
 
     $action = $_POST['action'];
-    $db = mysqli_connect('localhost','root','','zelli');
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
 
     if('ADD' == $action){
         $did = $_POST['did'];

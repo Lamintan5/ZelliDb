@@ -1,18 +1,9 @@
 <?php
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "zelli";
+    include 'db_config.php';
+
     $table = "managers";
 
     $action = $_POST['action'];
-
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    $db = mysqli_connect('localhost','root','','zelli');
-   
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
 
     if('ADD' == $action){
         $pid = $_POST['pid'];

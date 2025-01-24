@@ -1,19 +1,9 @@
 <?php
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "zelli";
+    include 'db_config.php';
+
     $table = "payments";
-    $db = mysqli_connect('localhost','root','','zelli');
+
     $action = $_POST['action'];
-
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
     
     if('ADD' == $action){
         $payid = $_POST['payid'];
