@@ -74,13 +74,12 @@ io.on("connection", (socket) => {
             headings: {en: username,},
             included_segments: ["Subscribed Users"],
             buttons: [
-                { id: "1", text: "Reply", action: { url: `Zelli://message?userId=${targetId}` } },
+                { id: "1", text: "Reply", },
                 { id: "2", text: "Ignore",},
             ],
             include_player_ids: recipientToken,
             content_available: true,
             small_icon: "ic_app_log",
-            groupSummaryIcon: "ic_app_log",
             large_icon: profile,
             big_picture: image,
             data: {
@@ -126,7 +125,7 @@ io.on("connection", (socket) => {
             headings: {en: title,},
             included_segments: ["Grouped Users"],
             buttons: [
-                { id: "1", text: "Reply", action: { url: `Zelli://message?userId=123` } },
+                { id: "1", text: "Reply",},
                 { id: "2", text: "Ignore",},
             ],
             include_player_ids: recipientToken,
@@ -177,7 +176,6 @@ io.on("connection", (socket) => {
             include_player_ids: recipientToken,
             content_available: true,
             small_icon: "ic_app_log",
-            groupSummaryIcon: "ic_app_log",
             large_icon: profile,
             big_picture: image,
            
@@ -348,97 +346,97 @@ app.post("/api/stkpush", async (req, res) => {
 });
 
 //STK PUSH CALLBACK ROUTE
-const db = mysql.createConnection({
-  host: "0.0.0.0", 
-  user: "root", 
-  password: "", 
-  database: "zelli", 
-});
+// const db = mysql.createConnection({
+//   host: "0.0.0.0", 
+//   user: "root", 
+//   password: "", 
+//   database: "zelli", 
+// });
 
-db.connect((err) => {
-  if (err) {
-    console.error("Error connecting to the database:", err);
-  } else {
-    console.log("Connected to the database.");
-  }
-});
+// db.connect((err) => {
+//   if (err) {
+//     console.error("Error connecting to the database:", err);
+//   } else {
+//     console.log("Connected to the database.");
+//   }
+// });
 
 app.post("/api/callback", (req, res) => {
   console.log("Response", req.body);
 
-  const CheckoutRequestID = req.body.Body.stkCallback.CheckoutRequestID;
-  const ResultCode = req.body.Body.stkCallback.ResultCode;
-  const ResultDesc = req.body.Body.stkCallback.ResultDesc;
-  const callbackData = req.body.Body.stkCallback;
-  let mpesaReceiptNumber = null;
+  // const CheckoutRequestID = req.body.Body.stkCallback.CheckoutRequestID;
+  // const ResultCode = req.body.Body.stkCallback.ResultCode;
+  // const ResultDesc = req.body.Body.stkCallback.ResultDesc;
+  // const callbackData = req.body.Body.stkCallback;
+  // let mpesaReceiptNumber = null;
 
-  console.log("Full Callback Body: ", JSON.stringify(req.body, null, 2));
+  // console.log("Full Callback Body: ", JSON.stringify(req.body, null, 2));
 
-  if (ResultCode === 0) {
-    const items = callbackData.CallbackMetadata.Item;
-    const receipt = items.find((item) => item.Name === "MpesaReceiptNumber");
-    mpesaReceiptNumber = receipt ? receipt.Value : null;
-    paymentmodel["payid"] = mpesaReceiptNumber;
-  }
+  // if (ResultCode === 0) {
+  //   const items = callbackData.CallbackMetadata.Item;
+  //   const receipt = items.find((item) => item.Name === "MpesaReceiptNumber");
+  //   mpesaReceiptNumber = receipt ? receipt.Value : null;
+  //   paymentmodel["payid"] = mpesaReceiptNumber;
+  // }
 
-  const pay = {
-    payid: mpesaReceiptNumber,
-    accessToken: stkToken,
-    status: ResultCode === 0 ? "Success" : "Failed",
-    targetId: paymentmodel["payerid"],
-    resultDesc: ResultDesc,
-  };
+  // const pay = {
+  //   payid: mpesaReceiptNumber,
+  //   accessToken: stkToken,
+  //   status: ResultCode === 0 ? "Success" : "Failed",
+  //   targetId: paymentmodel["payerid"],
+  //   resultDesc: ResultDesc,
+  // };
 
-  if (clients[pay.targetId]) {
-    clients[pay.targetId].emit("pay", pay);
-  } else {
-    console.log(`User1 ${pay.targetId} not found`);
-  }
+  // if (clients[pay.targetId]) {
+  //   clients[pay.targetId].emit("pay", pay);
+  // } else {
+  //   console.log(`User1 ${pay.targetId} not found`);
+  // }
 
-  if (ResultCode === 0) {
-    const json = JSON.stringify(req.body, null, 2);
+  // if (ResultCode === 0) {
+  //   const json = JSON.stringify(req.body, null, 2);
 
-    fs.writeFile("stkcallback.json", json, "utf8", function (err) {
-      if (err) {
-        return console.log("Error writing JSON file:", err);
-      }
-      console.log("STK PUSH CALLBACK JSON FILE SAVED");
-    });
+  //   fs.writeFile("stkcallback.json", json, "utf8", function (err) {
+  //     if (err) {
+  //       return console.log("Error writing JSON file:", err);
+  //     }
+  //     console.log("STK PUSH CALLBACK JSON FILE SAVED");
+  //   });
 
-    const { payid, pid, admin, tid, lid, eid, uid, payerid, amount, balance, method, type, time, current, checked } = paymentmodel;
-    const query = `
-      INSERT INTO payments (
-        payid, pid, admin, tid, lid, eid, uid, payerid, amount, balance, method, type, time, current, checked
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+  //   const { payid, pid, admin, tid, lid, eid, uid, payerid, amount, balance, method, type, time, current, checked } = paymentmodel;
+  //   const query = `
+  //     INSERT INTO payments (
+  //       payid, pid, admin, tid, lid, eid, uid, payerid, amount, balance, method, type, time, current, checked
+  //     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  //   `;
 
-    const values = [payid, pid, admin, tid, lid, eid, uid, payerid, amount, balance, method, type, time, current, checked];
+  //   const values = [payid, pid, admin, tid, lid, eid, uid, payerid, amount, balance, method, type, time, current, checked];
 
-    db.query(query, values, (err, result) => {
-      if (err) {
-        console.error("Error inserting payment into database:", err);
-      } else {
-        console.log("Payment inserted successfully:", result);
-      }
-    });
+  //   db.query(query, values, (err, result) => {
+  //     if (err) {
+  //       console.error("Error inserting payment into database:", err);
+  //     } else {
+  //       console.log("Payment inserted successfully:", result);
+  //     }
+  //   });
 
-    res.status(200).json({
-      success: true,
-      message: "Payment was successful. Callback data saved.",
-      CheckoutRequestID: CheckoutRequestID,
-      ResultDesc: ResultDesc,
-    });
-  } else {
+  //   res.status(200).json({
+  //     success: true,
+  //     message: "Payment was successful. Callback data saved.",
+  //     CheckoutRequestID: CheckoutRequestID,
+  //     ResultDesc: ResultDesc,
+  //   });
+  // } else {
 
-    res.status(400).json({
-      success: false,
-      message: "Payment failed.",
-      CheckoutRequestID: CheckoutRequestID,
-      ResultCode: ResultCode,
-      ResultDesc: ResultDesc,
-      errorDetails: req.body,
-    });
-  }
+  //   res.status(400).json({
+  //     success: false,
+  //     message: "Payment failed.",
+  //     CheckoutRequestID: CheckoutRequestID,
+  //     ResultCode: ResultCode,
+  //     ResultDesc: ResultDesc,
+  //     errorDetails: req.body,
+  //   });
+  // }
 });
 
 app.get("/api/confirmation", (req, res) => {
