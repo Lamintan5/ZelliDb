@@ -233,9 +233,8 @@ async function getAccessToken() {
     const response = await axios.get(url, {
       headers: { Authorization: auth },
     });
-    return response.data; // Return the full response body
+    return response.data; 
   } catch (error) {
-    // Return error details for better debugging
     return {
       success: false,
       message: error.message,
@@ -248,7 +247,6 @@ async function getAccessToken() {
 app.post("/api/registerurl", async (req, res) => {
   try {
     const { accessToken, ShortCode } = req.body;
-
     // Validate the required parameters
     if (!accessToken || !ShortCode) {
       return res.status(400).json({
